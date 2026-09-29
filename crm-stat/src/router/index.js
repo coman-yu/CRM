@@ -2,7 +2,6 @@
 import OperationStat from "../views/OperationStat.vue";
 import Login from "../views/Login.vue";
 import StatIndex from "../views/StatIndex.vue";
-import MemberInput from "../views/MemberInput.vue";
 import CustomerAdd from "../views/CustomerAdd.vue";
 import CustomerList from "../views/CustomerList.vue";
 import CustomerDetail from "../views/CustomerDetail.vue";
@@ -28,11 +27,6 @@ const routes = [
         path: "stat",
         name: "运营统计",
         component: StatIndex,
-      },
-      {
-        path: "member/:username",
-        name: "组员录入",
-        component: MemberInput,
       },
       {
         path: "customerAdd",
@@ -70,7 +64,7 @@ const router = createRouter({
 
 // 登录守卫：未登录访问后台跳登录页，已登录访问登录页跳回后台
 router.beforeEach((to, from, next) => {
-  const user = localStorage.getItem("crm_current_user");
+  const user = sessionStorage.getItem("crm_current_user");
   if (to.path.startsWith("/dashboard") && !user) {
     return next("/login");
   }
@@ -78,7 +72,7 @@ router.beforeEach((to, from, next) => {
     return next("/dashboard/stat");
   }
 
-  // 销售角色禁止访问运营统计相关路由（stat / member/*）
+  // 销售角色禁止访问运营统计路由（stat）
   if (user) {
     let currentUser = null;
     try {
@@ -89,8 +83,7 @@ router.beforeEach((to, from, next) => {
     if (
       currentUser &&
       currentUser.role === "sales" &&
-      (to.path.startsWith("/dashboard/stat") ||
-        to.path.startsWith("/dashboard/member/"))
+      to.path.startsWith("/dashboard/stat")
     ) {
       return next("/dashboard/customerList");
     }

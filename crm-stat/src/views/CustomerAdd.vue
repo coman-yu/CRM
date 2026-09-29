@@ -87,9 +87,9 @@ import { addCustomerApi } from "@/api/customer";
 const router = useRouter();
 const formRef = ref(null);
 
-// 当前登录用户（录入人），从localStorage拿
+// 当前登录用户（录入人），从sessionStorage拿
 const currentUser = ref(
-  JSON.parse(localStorage.getItem("crm_current_user")) || "",
+  JSON.parse(sessionStorage.getItem("crm_current_user")) || "",
 );
 
 const form = ref({

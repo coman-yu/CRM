@@ -31,21 +31,6 @@
         <el-sub-menu index="data" v-if="currentUser.role !== 'sales'">
           <template #title>数据统计</template>
           <el-menu-item index="/dashboard/stat">运营统计</el-menu-item>
-          <div
-            v-if="
-              currentUser.role === 'admin' ||
-              currentUser.role === 'operator' ||
-              currentUser.role === 'middleman'
-            "
-          >
-            <el-menu-item
-              v-for="m in menuMembers"
-              :key="m.username"
-              :index="`/dashboard/member/${m.username}`"
-            >
-              <span>{{ m.username }}</span>
-            </el-menu-item>
-          </div>
         </el-sub-menu>
       </el-menu>
     </el-aside>
@@ -76,10 +61,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
-import { getMemberListApi } from "@/api/auth";
 import { useUser } from "@/composable/useUser";
 
 const { clearUserInfo, userInfo: currentUser } = useUser();
@@ -88,14 +72,6 @@ const route = useRoute();
 
 // 是否是超级管理员
 const isAdmin = computed(() => currentUser.role === "admin");
-// 侧边栏用户列表：只显示运营(operator)角色
-const menuMembers = computed(() => {
-  const list = isAdmin.value ? members.value : [currentUser];
-  return list.filter((m) => m.role === "operator");
-});
-
-// 组员列表（用于侧边菜单渲染）
-const members = ref([]);
 
 // 退出登录
 const logout = () => {
@@ -104,18 +80,6 @@ const logout = () => {
   ElMessage.success("已退出登录");
 };
 
-// 获取组员列表
-const getMemberList = async () => {
-  try {
-    const res = await getMemberListApi();
-    if (res.code === 200) {
-      members.value = res.data;
-    }
-  } catch (e) {
-    ElMessage.error("获取组员列表失败");
-    console.error(e);
-  }
-};
 
 const getCurrentRole = () => {
   if (currentUser.role === "admin") {
@@ -133,9 +97,6 @@ const getCurrentRole = () => {
   return "";
 };
 
-onMounted(() => {
-  getMemberList();
-});
 </script>
 
 <style scoped lang="scss">
